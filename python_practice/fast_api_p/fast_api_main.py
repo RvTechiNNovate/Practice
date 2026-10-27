@@ -1,5 +1,7 @@
-from fastapi import FastAPI, Request, Response, status
+from fastapi import FastAPI, Request, Response, status , Cookie
 from pydantic import BaseModel
+from fastapi.responses import FileResponse
+
 
 class RequestPayload(BaseModel):
     id:str
@@ -26,6 +28,14 @@ def put_api(data:RequestPayload):
     print(data.name)
     print(data.age)
     return {"result":"this put request is successful"}
+
+@app.get("/items/")
+async def read_items(ads_id: str | None = Cookie(default=None)):
+    return {"ads_id": ads_id}
+
+@app.get("/",response_class=FileResponse)
+async def read_index():
+    return FileResponse("index.html")
 
 if __name__=="__main__":
     import uvicorn

@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JWT Login Demo</title>
+</head>
+<body>
+    <h2>JWT Authentication Demo</h2>
+
+    <button onclick="login()">Login</button>
+    <button onclick="getProfile()">Get Profile</button>
+
+    <p id="result"></p>
+
+    <script>
+        let token = null;
+
+        async function login() {
+            const response = await fetch("/login", {
+                method: "POST"
+            });
+
+            const data = await response.json();
+
+            token = data.access_token;
+
+            document.getElementById("result").textContent =
+                "Login successful! JWT received.";
+        }
+
+        async function getProfile() {
+            const response = await fetch("/profile", {
+                headers: {
+                    "Authorization": `Bearer ${token ?? ""}`
+                }
+            });
+
+            const data = await response.json();
+
+            document.getElementById("result").textContent =
+                response.ok ? data.message : data.detail;
+        }
+    </script>
+</body>
+</html>

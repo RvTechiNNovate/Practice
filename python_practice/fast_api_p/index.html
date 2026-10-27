@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Platform Consent Sandbox</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #f5f7fb; padding: 40px; margin: 0; }
+        .dashboard { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        h1 { color: #1e293b; margin-top: 0; }
+        pre { background: #0f172a; color: #38bdf8; padding: 15px; border-radius: 6px; font-family: monospace; }
+        
+        /* The Cookie Consent Banner Layout */
+        .cookie-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: #1e293b;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transform: translateY(150%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .cookie-banner.show { transform: translateY(0); }
+        .cookie-banner p { margin: 0; font-size: 14px; max-width: 70%; line-height: 1.4; }
+        .cookie-btn { background: #38bdf8; color: #0f172a; border: none; padding: 10px 20px; font-weight: bold; border-radius: 6px; cursor: pointer; }
+        .cookie-btn:hover { background: #7dd3fc; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <h1>AI App Portal Dashboard</h1>
+        <p>This layout communicates with FastAPI on port 8001 to verify structural authorization details below:</p>
+        <pre id="app-state">Checking current server authentication state...</pre>
+    </div>
+
+    <!-- The Hidden Consent UI Node -->
+    <div id="consent-banner" class="cookie-banner">
+        <p>🤖 <strong>Cookie Authorization Notice:</strong> We use functional data layers and AI telemetry tracking keys to optimize your contextual intelligence experience. Accept to authorize execution.</p>
+        <button class="cookie-btn" onclick="grantConsent()">Accept All</button>
+    </div>
+
+```html
+<h2>Cookie Login Demo</h2>
+
+<button onclick="login()">Login</button>
+<button onclick="getProfile()">Check Profile</button>
+
+<p id="result"></p>
+
+<script>
+async function login() {
+    const response = await fetch("/login", {
+        method: "POST",
+        credentials: "include"
+    });
+
+    const data = await response.json();
+    document.getElementById("result").textContent = data.message;
+}
+
+async function getProfile() {
+    const response = await fetch("/profile", {
+        credentials: "include"
+    });
+
+    const data = await response.json();
+
+    document.getElementById("result").textContent =
+        response.ok
+            ? data.message
+            : data.detail;
+}
+
+    const API_URL = "http://127.0.0.1:8001/api/v1";
+
+    // 1. Check application state
+    async function checkAppState() {
+        try {
+            const res = await fetch(`${API_URL}/init`, {
+                credentials: "include"
+            });
+
+            if (!res.ok) {
+                throw new Error(`HTTP error: ${res.status}`);
+            }
+
+            const data = await res.json();
+
+            document.getElementById("app-state").innerText =
+                JSON.stringify(data, null, 2);
+
+            const banner = document.getElementById("consent-banner");
+
+            if (data.needs_consent_banner) {
+                banner.classList.add("show");
+            } else {
+                banner.classList.remove("show");
+            }
+        } catch (err) {
+            document.getElementById("app-state").innerText =
+                "Failed connection to core API on port 8001.";
+
+            console.error("Connection error:", err);
+        }
+    }
+
+    // 2. Accept cookie consent
+
+async function grantConsent() {
+    try {
+        const res = await fetch(`${API_URL}/accept-cookies`, {
+            method: "POST",
+            credentials: "include"
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP error: ${res.status}`);
+        }
+
+        const data = await res.json();
+        console.log("Consent recorded:", data);
+
+        // Hide banner immediately; do not call init again
+        document.getElementById("consent-banner")
+            .classList.remove("show");
+
+        // Update displayed state if needed
+        document.getElementById("app-state").innerText =
+            JSON.stringify({
+                needs_consent_banner: false,
+                analytics_active: true,
+                message: "Consent accepted"
+            }, null, 2);
+
+    } catch (err) {
+        console.error("Failed to record consent:", err);
+    }
+}
+
+    // 3. Run on application startup
+    window.addEventListener("load", checkAppState);
+</script>
+
+</body>
+</html>

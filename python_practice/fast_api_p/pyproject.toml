@@ -8,5 +8,7 @@ dependencies = [
     "fastapi>=0.149.0",
     "flagembedding>=1.4.2",
     "pydantic>=2.14.1",
+    "pyjwt>=2.15.1",
+    "python-multipart>=0.0.32",
     "uvicorn>=0.54.0",
 ]

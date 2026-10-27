@@ -63,8 +63,6 @@ def login_pass(req_form_data:OAuth2PasswordRequestForm=Depends()):
     response=validate_with_response(req_form_data.username,req_form_data.password)
     return  response
 
-
-
 def get_current_user(token: str = Depends(oauth_scheme)):
     try:
         payload = jwt.decode(
@@ -77,13 +75,6 @@ def get_current_user(token: str = Depends(oauth_scheme)):
 @app.get("/profile")
 def get_profile(username:str = Depends(get_current_user)):
     return {"response":"Welcome"+ username}
-
-
-
-
-
-
-
 
 
 if __name__=="__main__":

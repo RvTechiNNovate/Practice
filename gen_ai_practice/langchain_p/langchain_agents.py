@@ -46,8 +46,10 @@ agent = create_agent(
     # state_schema=MyState
 )
 
-result1= agent.invoke({
-    "messages": [{"role": "user", "content": "what is groq? give me response in short"}]},
+result1= agent.invoke(
+    {
+    "messages": [{"role": "user", "content": "what is groq? give me response in short"}]
+    },
     config
     )
 
